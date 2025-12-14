@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Aplikasi CRUD - Data Mahasiswa</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+h1 {
+    text-align: center;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+input, button {
+    padding: 8px;
+    margin: 5px 0;
+}
+button {
+    cursor: pointer;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+table, th, td {
+    border: 1px solid #ccc;
+}
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+.action-btn {
+    margin: 0 3px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Aplikasi CRUD Data Mahasiswa</h1>
+
+    <input type="hidden" id="indexEdit">
+
+    <label>Nama:</label><br>
+    <input type="text" id="nama" placeholder="Nama mahasiswa"><br>
+
+    <label>NIM:</label><br>
+    <input type="text" id="nim" placeholder="NIM"><br>
+
+    <label>Jurusan:</label><br>
+    <input type="text" id="jurusan" placeholder="Jurusan"><br>
+
+    <button onclick="simpanData()">Simpan</button>
+    <button onclick="resetForm()">Reset</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>NIM</th>
+                <th>Jurusan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="dataMahasiswa"></tbody>
+    </table>
+</div>
+
+<script>
+let mahasiswa = JSON.parse(localStorage.getItem("mahasiswa")) || [];
+
+function tampilkanData() {
+    let tbody = document.getElementById("dataMahasiswa");
+    tbody.innerHTML = "";
+
+    mahasiswa.forEach((mhs, index) => {
+        tbody.innerHTML += `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${mhs.nama}</td>
+            <td>${mhs.nim}</td>
+            <td>${mhs.jurusan}</td>
+            <td>
+                <button class="action-btn" onclick="editData(${index})">Edit</button>
+                <button class="action-btn" onclick="hapusData(${index})">Hapus</button>
+            </td>
+        </tr>
+        `;
+    });
+
+    localStorage.setItem("mahasiswa", JSON.stringify(mahasiswa));
+}
+
+function simpanData() {
+    let nama = document.getElementById("nama").value;
+    let nim = document.getElementById("nim").value;
+    let jurusan = document.getElementById("jurusan").value;
+    let indexEdit = document.getElementById("indexEdit").value;
+
+    if (nama === "" || nim === "" || jurusan === "") {
+        alert("Semua field wajib diisi!");
+        return;
+    }
+
+    let data = { nama, nim, jurusan };
+
+    if (indexEdit === "") {
+        mahasiswa.push(data); // CREATE
+    } else {
+        mahasiswa[indexEdit] = data; // UPDATE
+    }
+
+    resetForm();
+    tampilkanData();
+}
+
+function editData(index) {
+    let mhs = mahasiswa[index];
+    document.getElementById("nama").value = mhs.nama;
+    document.getElementById("nim").value = mhs.nim;
+    document.getElementById("jurusan").value = mhs.jurusan;
+    document.getElementById("indexEdit").value = index;
+}
+
+function hapusData(index) {
+    if (confirm("Yakin ingin menghapus data ini?")) {
+        mahasiswa.splice(index, 1); // DELETE
+        tampilkanData();
+    }
+}
+
+function resetForm() {
+    document.getElementById("nama").value = "";
+    document.getElementById("nim").value = "";
+    document.getElementById("jurusan").value = "";
+    document.getElementById("indexEdit").value = "";
+}
+
+tampilkanData(); // READ
+</script>
+
+</body>
+</html>
